@@ -3,6 +3,8 @@
 Python module for loading data from SpectroWorks™.
 
 ## How does it work?
+You can try it out by using our interactive JupyterLab notebook here [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cphnano/pySpectroWorks/master?urlpath=lab/tree/Demo-education.ipynb).
+
 An example script can be found in [api_test.py](api_test.py)
 
 The pySpectroWorks module is divided into 3 classes: 
