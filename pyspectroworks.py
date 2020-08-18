@@ -77,5 +77,5 @@ class Item:
 
 
 def connect(api_key):
-    return Connection(api_key, 'https://api.spectroworks.com/dev/api/')
+    return Connection(api_key, 'https://api.spectroworks.com/prod/api/')
 
