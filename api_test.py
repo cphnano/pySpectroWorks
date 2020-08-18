@@ -11,10 +11,11 @@ for i, project in enumerate(projects):
     timestamp = datetime.utcfromtimestamp(project.created/1000).strftime('%Y-%m-%d %H:%M:%S')
     print('{: >3} {: >24} {: >24} '.format(i, project.project_name, timestamp))
 
-print('\n\nOPENING PROJECT "{}":'.format(projects[0].project_name))
+project = projects[0]
+print('\n\nOPENING PROJECT "{}":'.format(project.project_name))
 # load all files in project
 print('{: >6}{: >2}\t{: >8}'.format('CUVETTE', ' ', 'REFRACTIVE INDEX'))
-items = projects[0].get_items()
+items = project.get_items()
 for item in items:
     res = item.results.get('refractive_index', {})
     ri = res.get('value', 'N/A')

@@ -41,7 +41,8 @@ class Project:
             file_ids = [file['file_id'] for file in file_list]
             res = requests.post(conn.url + 'get_files',
                                 params={'api_key': conn.api_key}, data=json.dumps(file_ids))
-            self.items = [Item(self.connection, item) for item in json.loads(res.text)['message']['items']]
+            items = [Item(self.connection, item) for item in json.loads(res.text)['message']['items']]
+            self.items = [item for item in items if item.completeness == 100]
 
         return self.items
 
@@ -56,6 +57,7 @@ class Item:
         self.modified = float(data.get('modified', 0))
         self.cuvette_idx = int(data.get('cuvette_idx', 0))
         self.box_code = data.get('box_code', 'XXXXXX')
+        self.completeness = int(data.get('completeness', 0))
         self.results = data.get('results', {})
 
     def get_spectrum(self, spectrum_type):
