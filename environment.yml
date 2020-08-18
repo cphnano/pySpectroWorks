@@ -6,7 +6,6 @@ dependencies:
   - requests
   # Jupyter
   - jupyterlab=1.0
-  - nodejs=11
   - nbconvert=5.5
   - widgetsnbextension=3.5
   # Python Kernel
@@ -17,10 +16,7 @@ dependencies:
   - bqplot=0.11.6
   - dask=2.1
   - matplotlib=3.1
-  - pandas=0.24
   - python=3.7
-  - scikit-image=0.15
-  - scikit-learn=0.21
   - sympy=1.4
   - pyyaml
   - traittypes==0.2.1
