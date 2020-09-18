@@ -32,6 +32,9 @@ class Project:
 
     def get_items(self):
         # load items
+        def sort_by_created(item):
+            return item.created
+
         if self.items is None:
             conn = self.connection
             res = requests.get(conn.url + 'list_files_by_project',
@@ -43,6 +46,7 @@ class Project:
                                 params={'api_key': conn.api_key}, data=json.dumps(file_ids))
             items = [Item(self.connection, item) for item in json.loads(res.text)['message']['items']]
             self.items = [item for item in items if item.completeness == 100]
+            self.items.sort(key=sort_by_created)
 
         return self.items
 
