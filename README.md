@@ -3,7 +3,7 @@
 Python module for loading data from SpectroWorks™.
 
 ## How does it work?
-You can try it out by using our interactive JupyterLab notebook here [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cphnano/pySpectroWorks/master?urlpath=lab/tree/Demo-education.ipynb).
+You can try it out by using our interactive JupyterLab notebook here [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cphnano/pySpectroWorks/master?urlpath=lab/tree/Demo-education.ipynb). (ctrl/cmd + click to open in a new tab)
 
 An example script can be found in [api_test.py](api_test.py)
 
@@ -12,7 +12,7 @@ The pySpectroWorks module is divided into 3 classes:
  - Project
  - Item
  
- You must first establish a connection by using your API key. An API key can be generated from you "profile" page in SpectroWorks™.
+ You must first establish a connection by using your API key. An API key can be generated from your "profile" page in SpectroWorks™.
 ```
 import pyspectroworks
 conn = pyspectroworks.connect('INSERT_API_KEY_HERE')
