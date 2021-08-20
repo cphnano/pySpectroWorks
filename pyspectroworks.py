@@ -28,8 +28,8 @@ class Project:
         self._project_id = data['project_id']
         self.project_name = data.get('project_name', '')
         self.num_files = int(data.get('num_files', 0))
-        self.created = float(data.get('created', 0))
-        self.modified = float(data.get('modified', 0))
+        self.created = float(data.get('created', 0)) / 1000
+        self.modified = float(data.get('modified', 0)) / 1000
         self.items = None
 
     def get_items(self):
