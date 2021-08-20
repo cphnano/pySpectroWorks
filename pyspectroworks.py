@@ -23,7 +23,7 @@ class Project:
         self.connection = connection
         if data is None:
             data = {}
-        self.data = data
+        self._project_id = data['project_id']
         self.project_name = data.get('project_name', '')
         self.num_files = int(data.get('num_files', 0))
         self.created = float(data.get('created', 0))
@@ -35,7 +35,7 @@ class Project:
         if self.items is None:
             conn = self.connection
             res = requests.get(conn.url + 'list_files_by_project',
-                               params={'api_key': conn.api_key, 'project_id': int(self.data['project_id'])})
+                               params={'api_key': conn.api_key, 'project_id': int(self._project_id)})
             file_list = json.loads(res.text)['message']['items']
 
             file_ids = [file['file_id'] for file in file_list]
@@ -52,28 +52,40 @@ class Item:
         self.connection = connection
         if data is None:
             data = {}
-        self.data = data
-        self.created = float(data.get('created', 0))
-        self.modified = float(data.get('modified', 0))
-        self.cuvette_idx = int(data.get('cuvette_idx', 0))
-        self.box_code = data.get('box_code', 'XXXXXX')
+        self._file_id = data['file_id']
+        self._project_id = data['project_id']
+        self.created = float(data.get('created', 0)) / 1000
+        self.modified = float(data.get('modified', 0)) / 1000
+        self.cuvette_idx = int(data.get('cuvette_idx', -1))
+        self.box_code = data.get('box_code', None)
         self.completeness = int(data.get('completeness', 0))
         self.results = data.get('results', {})
 
+        self.sample_attributes = {}
+        sample_attributes = data.input.get('input_tags', {})
+        for key, val in sample_attributes.items():
+            self.sample_attributes[key] = val['value']
+
     def get_spectrum(self, spectrum_type):
+        conn = self.connection
         spectrum_names = {
+            'reference_a': 'ref_a',
             'reference_b': 'ref',
+            'reference_d': 'ref_d',
             'sample_b': 'ri1',
             'sample_d': 'ri2',
             'sample_a': 'abs'
         }
-        spectrum_name = spectrum_names[spectrum_type.lower()]
-        conn = self.connection
-        res = requests.get(conn.url + 'get_spectrum',
-                           params={'api_key': conn.api_key,
-                                   'file_id': int(self.data['file_id']),
-                                   'spectrum_types': ['spectrum_'+spectrum_name]})
-        return json.loads(res.text)['message']['spectrum_'+spectrum_name]['spectrum']
+        spectrum_type = spectrum_type.lower()
+
+        if spectrum_type in spectrum_names.keys():
+            spectrum_name = spectrum_names[spectrum_type]
+            res = requests.get(conn.url + 'get_spectrum',
+                               params={'api_key': conn.api_key,
+                                       'file_id': int(self._file_id),
+                                       'spectrum_types': ['spectrum_'+spectrum_name]})
+            return json.loads(res.text)['message']['spectrum_'+spectrum_name]['spectrum']
+        raise KeyError('No such spectrum')
 
 
 def connect(api_key):
