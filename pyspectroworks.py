@@ -100,6 +100,5 @@ class Item:
         raise KeyError('No such spectrum')
 
 
-def connect(api_key):
-    return Connection(api_key, 'https://api.spectroworks.com/prod/api/')
-
+def connect(api_key, stage='prod'):
+    return Connection(api_key, f'https://api.spectroworks.com/{stage}/api/')
