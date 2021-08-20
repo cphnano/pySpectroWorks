@@ -12,6 +12,8 @@ class Connection:
         # load projects
         if self.projects is None:
             res = requests.get(self.url + 'list_projects', params={'api_key': self.api_key})
+            if res.status_code != 200:
+                raise ConnectionError(json.loads(res.text)['message'])
             projects = json.loads(res.text)['message']['items']
             self.projects = [Project(self, project) for project in projects]
 
@@ -39,11 +41,15 @@ class Project:
             conn = self.connection
             res = requests.get(conn.url + 'list_files_by_project',
                                params={'api_key': conn.api_key, 'project_id': int(self._project_id)})
+            if res.status_code != 200:
+                raise ConnectionError(json.loads(res.text)['message'])
             file_list = json.loads(res.text)['message']['items']
 
             file_ids = [file['file_id'] for file in file_list]
             res = requests.post(conn.url + 'get_files',
                                 params={'api_key': conn.api_key}, data=json.dumps(file_ids))
+            if res.status_code != 200:
+                raise ConnectionError(json.loads(res.text)['message'])
             items = [Item(self.connection, item) for item in json.loads(res.text)['message']['items']]
             self.items = [item for item in items if item.completeness == 100]
             self.items.sort(key=sort_by_created)
@@ -66,7 +72,7 @@ class Item:
         self.results = data.get('results', {})
 
         self.sample_attributes = {}
-        sample_attributes = data.input.get('input_tags', {})
+        sample_attributes = data.get('input_tags', {})
         for key, val in sample_attributes.items():
             self.sample_attributes[key] = val['value']
 
@@ -88,6 +94,8 @@ class Item:
                                params={'api_key': conn.api_key,
                                        'file_id': int(self._file_id),
                                        'spectrum_types': ['spectrum_'+spectrum_name]})
+            if res.status_code != 200:
+                raise ConnectionError(json.loads(res.text)['message'])
             return json.loads(res.text)['message']['spectrum_'+spectrum_name]['spectrum']
         raise KeyError('No such spectrum')
 
