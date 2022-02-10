@@ -31,7 +31,7 @@ class Project:
         self.num_files = int(data.get('num_files', 0))
         self.created = float(data.get('created', 0)) / 1000
         self.modified = float(data.get('modified', 0)) / 1000
-        self.results = data.get('results', {})
+        self.results = data.get('results', [])
         self.items = None
 
     def __str__(self):
@@ -80,12 +80,13 @@ class Item:
 
         # add input variables to results
         if self.project:
-            for result_key, result_value in self.project.results.items():
-                input_variables = result_value.get('input_variables', {})
+            for result in self.project.results:
+                input_variables = result.get('input_variables', {})
+                result_id = result['result_id']
                 for key, val in input_variables.items():
-                    if not self.results[result_key]:
-                        self.results[result_key] = {}
-                    self.results[result_key][key] = val
+                    if not self.results[result_id]:
+                        self.results[result_id] = {}
+                    self.results[result_id][key] = val
 
         self.sample_attributes = {}
         sample_attributes = data.get('input_tags', {})
