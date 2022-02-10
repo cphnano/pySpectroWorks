@@ -1,5 +1,6 @@
 import json
 import requests
+from datetime import datetime
 
 
 class Connection:
@@ -30,7 +31,12 @@ class Project:
         self.num_files = int(data.get('num_files', 0))
         self.created = float(data.get('created', 0)) / 1000
         self.modified = float(data.get('modified', 0)) / 1000
+        self.results = data.get('results', {})
         self.items = None
+
+    def __str__(self):
+        timestamp = datetime.utcfromtimestamp(self.created).strftime('%Y-%m-%d %H:%M:%S')
+        return f'{self.project_name}   {self.num_files} items   {timestamp}'
 
     def get_items(self):
         # load items
@@ -50,7 +56,7 @@ class Project:
                                 params={'api_key': conn.api_key}, data=json.dumps(file_ids))
             if res.status_code != 200:
                 raise ConnectionError(json.loads(res.text)['message'])
-            items = [Item(self.connection, item) for item in json.loads(res.text)['message']['items']]
+            items = [Item(self.connection, item, self) for item in json.loads(res.text)['message']['items']]
             self.items = [item for item in items if item.completeness == 100]
             self.items.sort(key=sort_by_created)
 
@@ -58,18 +64,28 @@ class Project:
 
 
 class Item:
-    def __init__(self, connection, data=None):
+    def __init__(self, connection, data=None, project=None):
         self.connection = connection
         if data is None:
             data = {}
         self._file_id = data['file_id']
         self._project_id = data['project_id']
+        self.project = project
         self.created = float(data.get('created', 0)) / 1000
         self.modified = float(data.get('modified', 0)) / 1000
         self.cuvette_idx = int(data.get('cuvette_idx', -1))
         self.box_code = data.get('box_code', None)
         self.completeness = int(data.get('completeness', 0))
         self.results = data.get('results', {})
+
+        # add input variables to results
+        if self.project:
+            for result_key, result_value in self.project.results.items():
+                input_variables = result_value.get('input_variables', {})
+                for key, val in input_variables.items():
+                    if not self.results[result_key]:
+                        self.results[result_key] = {}
+                    self.results[result_key][key] = val
 
         self.sample_attributes = {}
         sample_attributes = data.get('input_tags', {})
