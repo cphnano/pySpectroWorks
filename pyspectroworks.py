@@ -57,7 +57,7 @@ class Project:
             if res.status_code != 200:
                 raise ConnectionError(json.loads(res.text)['message'])
             items = [Item(self.connection, item, self) for item in json.loads(res.text)['message']['items']]
-            self.items = [item for item in items if item.completeness == 100]
+            self.items = [item for item in items if item.completeness == 100 and not item.hidden]
             self.items.sort(key=sort_by_created)
 
         return self.items
@@ -76,6 +76,7 @@ class Item:
         self.cuvette_idx = int(data.get('cuvette_idx', -1))
         self.box_code = data.get('box_code', None)
         self.completeness = int(data.get('completeness', 0))
+        self.hidden = bool(data.get('file_hidden', False))
         self.results = data.get('results', {})
 
         # add input variables to results
