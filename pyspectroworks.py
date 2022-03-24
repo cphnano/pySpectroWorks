@@ -82,11 +82,11 @@ class Item:
         # add input variables to results
         if self.project:
             for result in self.project.results:
-                input_variables = result.get('input_variables', {})
                 result_id = result['result_id']
-                for key, val in input_variables.items():
-                    if not self.results[result_id]:
-                        self.results[result_id] = {}
+                self.results[result_id] = self.results.get(result_id, {})  # use empty dict for results not in item
+                if 'input_variables' not in result.keys():
+                    continue
+                for key, val in result['input_variables'].items():
                     self.results[result_id][key] = val
 
         self.sample_attributes = {}
