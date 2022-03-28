@@ -134,6 +134,12 @@ class Item:
             'sample_d': 'ri2',
             'sample_a': 'abs'
         }
+        simulated_spectrum_names = {
+            'reference_b_model': 'ref',
+            'sample_b_model': 'sample',
+            'sample_d_model': 'ri2',
+            'sample_a_model': 'abs'
+        }
         spectrum_type = spectrum_type.lower()
 
         if spectrum_type in spectrum_names.keys():
@@ -142,9 +148,22 @@ class Item:
                                params={'api_key': conn.api_key,
                                        'file_id': int(self._file_id),
                                        'spectrum_types': ['spectrum_'+spectrum_name]})
+            data = json.loads(res.text)['message']
             if res.status_code != 200:
-                raise ConnectionError(json.loads(res.text)['message'])
-            return json.loads(res.text)['message']['spectrum_'+spectrum_name]['spectrum']
+                raise ConnectionError(data)
+            return data['spectrum_'+spectrum_name]['spectrum']
+
+        if spectrum_type in simulated_spectrum_names.keys():
+            spectrum_name = simulated_spectrum_names[spectrum_type]
+            res = requests.get(conn.url + 'get_simulated_spectrum',
+                               params={'api_key': conn.api_key,
+                                       'file_id': int(self._file_id),
+                                       'spectrum_types': [spectrum_name]})
+            data = json.loads(res.text)['message']
+            if res.status_code != 200:
+                raise ConnectionError(data)
+            return data[spectrum_name]['spectrum']
+
         raise KeyError('No such spectrum')
 
 
