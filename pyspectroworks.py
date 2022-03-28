@@ -46,17 +46,47 @@ class Project:
         if self.items is None:
             conn = self.connection
             res = requests.get(conn.url + 'list_files_by_project',
-                               params={'api_key': conn.api_key, 'project_id': int(self._project_id)})
+                               params={'api_key': conn.api_key,
+                                       'project_id': int(self._project_id),
+                                       'max_files': 1000})
+            data = json.loads(res.text)['message']
             if res.status_code != 200:
-                raise ConnectionError(json.loads(res.text)['message'])
-            file_list = json.loads(res.text)['message']['items']
+                raise ConnectionError(data)
+            file_list = data['items']
+
+            while 'last_key' in data.keys():
+                last_key = int(data['last_key'])
+                res = requests.get(conn.url + 'list_files_by_project',
+                                   params={'api_key': conn.api_key,
+                                           'project_id': int(self._project_id),
+                                           'max_files': 1000,
+                                           'last_key': last_key})
+                data = json.loads(res.text)['message']
+                if res.status_code != 200:
+                    raise ConnectionError(data)
+                file_list.extend(data['items'])
 
             file_ids = [file['file_id'] for file in file_list]
             res = requests.post(conn.url + 'get_files',
                                 params={'api_key': conn.api_key}, data=json.dumps(file_ids))
+
+            data = json.loads(res.text)['message']
             if res.status_code != 200:
-                raise ConnectionError(json.loads(res.text)['message'])
-            items = [Item(self.connection, item, self) for item in json.loads(res.text)['message']['items']]
+                raise ConnectionError(data)
+
+            items = data['items']
+
+            while data['unprocessed']:
+                file_ids = data['unprocessed']
+                res = requests.post(conn.url + 'get_files',
+                                    params={'api_key': conn.api_key}, data=json.dumps(file_ids))
+
+                data = json.loads(res.text)['message']
+                if res.status_code != 200:
+                    raise ConnectionError(data)
+                items.extend(data['items'])
+
+            items = [Item(self.connection, item, self) for item in items]
             self.items = [item for item in items if item.completeness == 100 and not item.hidden]
             self.items.sort(key=sort_by_created)
 
