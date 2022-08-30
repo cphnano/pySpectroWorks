@@ -109,6 +109,14 @@ class Item:
         self.hidden = bool(data.get('file_hidden', False))
         self.results = data.get('results', {})
 
+        # get size distribution result and convert to nm, %
+        size_dist_res = data.get('size_distribution_result', {})
+        radii = size_dist_res.get('radii', [])
+        vol = size_dist_res.get('size_distribution_vol', [])
+        dia_nm = [r * 2 * (10 ** 9) for r in radii]
+        vol_pct = [v * 100 for v in vol]
+        self.size_distribution = list(zip(dia_nm, vol_pct))
+
         # add input variables to results
         if self.project:
             for result in self.project.results:
@@ -123,6 +131,9 @@ class Item:
         sample_attributes = data.get('input_tags', {})
         for key, val in sample_attributes.items():
             self.sample_attributes[key] = val['value']
+
+    def get_size_distribution(self):
+        return self.size_distribution
 
     def get_spectrum(self, spectrum_type):
         conn = self.connection
