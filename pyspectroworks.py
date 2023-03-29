@@ -1,15 +1,25 @@
 import json
 import requests
 from datetime import datetime
+from typing import Dict, List, Tuple
 
 
 class Connection:
-    def __init__(self, api_key, url):
+    def __init__(self, api_key: str, url: str):
+        """
+        Initializes Connection object.
+        :param api_key: str, API key for the connection.
+        :param url: str, URL of the connection.
+        """
         self.api_key = api_key
         self.url = url
         self.projects = None
 
-    def get_projects(self):
+    def get_projects(self) -> list:
+        """
+        Returns a list of projects.
+        :return: list of Project objects.
+        """
         # load projects
         if self.projects is None:
             res = requests.get(self.url + 'list_projects', params={'api_key': self.api_key})
@@ -22,7 +32,12 @@ class Connection:
 
 
 class Project:
-    def __init__(self, connection, data=None):
+    def __init__(self, connection: Connection, data: dict = None):
+        """
+        Initializes Project object.
+        :param connection: Connection object.
+        :param data: dict, data for the project.
+        """
         self.connection = connection
         if data is None:
             data = {}
@@ -34,13 +49,21 @@ class Project:
         self.results = data.get('results', [])
         self.items = None
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """
+        Returns a string representation of the project.
+        :return: str, string representation of the project.
+        """
         timestamp = datetime.utcfromtimestamp(self.created).strftime('%Y-%m-%d %H:%M:%S')
         return f'{self.project_name}   {self.num_files} items   {timestamp}'
 
-    def get_items(self):
+    def get_items(self) -> list:
+        """
+        Returns a list of items.
+        :return: list of Item objects.
+        """
         # load items
-        def sort_by_created(item):
+        def sort_by_created(item: Item) -> float:
             return item.created
 
         if self.items is None:
@@ -94,7 +117,14 @@ class Project:
 
 
 class Item:
-    def __init__(self, connection, data=None, project=None):
+    def __init__(self, connection: 'Connection', data: Dict = None, project: 'Project' = None):
+        """
+        Item class constructor.
+        Args:
+            connection: A Connection object.
+            data: A dictionary containing data about the item.
+            project: A Project object, if the item is associated with a project.
+        """
         self.connection = connection
         if data is None:
             data = {}
@@ -132,10 +162,21 @@ class Item:
         for key, val in sample_attributes.items():
             self.sample_attributes[key] = val['value']
 
-    def get_size_distribution(self):
+    def get_size_distribution(self) -> List[Tuple[float, float]]:
+        """
+        Returns the size distribution data for the item.
+        """
         return self.size_distribution
 
-    def get_spectrum(self, spectrum_type):
+    def get_spectrum(self, spectrum_type: str) -> List[float]:
+        """
+        Returns the spectrum data for the item.
+        Args:
+            spectrum_type: A string representing the type of spectrum to retrieve.
+        Raises:
+            KeyError: If the spectrum type is not recognized.
+            ConnectionError: If the request to retrieve the spectrum fails.
+        """
         conn = self.connection
         spectrum_names = {
             'reference_a': 'ref_a',
@@ -178,5 +219,15 @@ class Item:
         raise KeyError('No such spectrum')
 
 
-def connect(api_key, stage='prod'):
+def connect(api_key: str, stage: str = 'prod') -> Connection:
+    """Connect to Spectroworks API using API key and stage.
+
+    Args:
+        api_key (str): API key for the Spectroworks API.
+        stage (str, optional): Stage of the API. Defaults to 'prod'.
+
+    Returns:
+        Connection: A Connection object that can be used to interact with the API.
+    """
     return Connection(api_key, f'https://api.spectroworks.com/{stage}/api/')
+
