@@ -138,6 +138,7 @@ class Item:
         self.completeness = int(data.get('completeness', 0))
         self.hidden = bool(data.get('file_hidden', False))
         self.results = data.get('results', {})
+        self.user_note = data.get('user_note', '')
 
         # get size distribution result and convert to nm, %
         size_dist_res = data.get('size_distribution_result', {})
@@ -161,6 +162,20 @@ class Item:
         sample_attributes = data.get('input_tags', {})
         for key, val in sample_attributes.items():
             self.sample_attributes[key] = val['value']
+
+    def __repr__(self):
+        d = {
+            'file_id': self._file_id,
+            'project_id': self._project_id,
+            'created': self.created,
+            'modified': self.modified,
+            'cuvette_idx': self.cuvette_idx,
+            'box_code': self.box_code,
+            'results': self.results,
+            'sample_attributes': self.sample_attributes,
+            'user_note': self.user_note
+        }
+        return json.dumps(d)
 
     def get_size_distribution(self) -> List[Tuple[float, float]]:
         """
