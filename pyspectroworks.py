@@ -2,6 +2,7 @@ import json
 import requests
 from datetime import datetime
 from typing import Dict, List, Tuple
+from math import sqrt
 
 
 class Connection:
@@ -139,6 +140,8 @@ class Item:
         self.hidden = bool(data.get('file_hidden', False))
         self.results = data.get('results', {})
         self.user_note = data.get('user_note', '')
+        self.reference_name = data.get('ref_name', '')
+        self.reference_ri = self.c1_to_n(data.get('ref_c1', 0.0))
 
         # get size distribution result and convert to nm, %
         size_dist_res = data.get('size_distribution_result', {})
@@ -163,6 +166,13 @@ class Item:
         for key, val in sample_attributes.items():
             self.sample_attributes[key] = val['value']
 
+    @staticmethod
+    def c1_to_n(c1):
+        n_water = 1.3332153809611258
+        pmt_water = n_water ** 2
+        pmt = 1 + (pmt_water - 1) * c1
+        return sqrt(pmt)
+
     def __repr__(self):
         d = {
             'file_id': self._file_id,
@@ -173,9 +183,11 @@ class Item:
             'box_code': self.box_code,
             'results': self.results,
             'sample_attributes': self.sample_attributes,
-            'user_note': self.user_note
+            'user_note': self.user_note,
+            'reference_name': self.reference_name,
+            'reference_ri': self.reference_ri
         }
-        return json.dumps(d)
+        return str(d)
 
     def get_size_distribution(self) -> List[Tuple[float, float]]:
         """
