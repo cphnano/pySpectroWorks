@@ -1,1 +1,1 @@
-from pyspectroworks import *
+from .pyspectroworks import *
