@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 [project]
 name = "pyspectroworks"
-version = "1.0.0"
+version = "1.0.1"
 authors = [
   { name="Thomas Sørensen", email="thots@cphnano.com" },
 ]
