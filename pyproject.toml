@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+[project]
+name = "pyspectroworks"
+version = "1.0.1"
+authors = [
+  { name="Thomas Sørensen", email="thots@cphnano.com" },
+]
+description = "pySpectroWorks is a Python module for loading data from SpectroWorks™."
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 5 - Production/Stable"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/cphnano/pySpectroWorks"
+"Bug Tracker" = "https://github.com/cphnano/pySpectroWorks/issues"

@@ -4,7 +4,13 @@ pySpectroWorks is a Python module for loading data from SpectroWorks™. This re
 
 ## Getting started
 
-import the module and establish a connection to SpectroWorks™ using your API key:
+Installation:
+
+```
+pip install pyspectroworks
+```
+
+Import the module and establish a connection to SpectroWorks™ using your API key:
 ```
 import pyspectroworks
 
