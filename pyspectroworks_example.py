@@ -8,7 +8,7 @@ print('PROJECTS: ')
 print('{: >3} {: >24} {: >24}'.format(' ', 'NAME', 'CREATED'))
 projects = conn.get_projects()
 for i, project in enumerate(projects):
-    timestamp = datetime.utcfromtimestamp(project.created/1000).strftime('%Y-%m-%d %H:%M:%S')
+    timestamp = datetime.utcfromtimestamp(project.created).strftime('%Y-%m-%d %H:%M:%S')
     print('{: >3} {: >24} {: >24} '.format(i, project.project_name, timestamp))
 
 project = projects[0]
